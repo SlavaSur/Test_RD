@@ -3,17 +3,22 @@ from s_test_rd.items import STestRdItem
 
 class RDSpider(scrapy.Spider):
     name = "spider_test"
-    #print('Введите ссылки:')
-    #start_urls = input().split(', ')
-    start_urls = ['https://github.com/scrapy', 'https://github.com/celery/']
+    start_urls = input('Введите ссылки:').split(', ')
 
-    #https://github.com/scrapy, https://github.com/celery/
     def parse(self, response):
         yield response.follow(response.css('a.UnderlineNav-item ::attr(href)').getall()[1], callback=self.parse)
         for link in response.xpath('//a[@class="d-inline-block"]/@href').getall():
             yield response.follow(link, callback=self.parse_info)
-            #yield response.follow(response.xpath('//a[@class="Link--primary d-flex no-underline"]/@href').get(), callback=self.parse_info)
 
+
+    # def parse_ch(self, response):
+        # page_changelog = response.xpath('//a[@class="Link--primary d-flex no-underline"]/@href').get()
+        # if page_changelog is not None:
+        #     page_changelog = response.urljoin(page_changelog)
+        #     yield scrapy.Request(page_changelog)
+        # item = STestRdItem()
+        # item = response.xpath('//div[@class="markdown-body my-3"]/p').getall()
+        # return item
 
     def parse_info(self, response):
         item = STestRdItem()
@@ -33,10 +38,7 @@ class RDSpider(scrapy.Spider):
         item['release'] = response.xpath('//a[@class="Link--primary no-underline"]//span/@title').get()
         item_2['version'] = response.xpath('//span[@class="css-truncate css-truncate-target text-bold mr-2"]/text()').get()
         item_2['datetime_release'] = response.xpath('//div[@class="text-small color-fg-muted"]//relative-time[@class="no-wrap"]/@datetime').get()
-        item_2['changelog']: 'changelog'
+        item_2['changelog'] = response.xpath('//a[@class="Link--primary d-flex no-underline"]/@href').get()
         item['info_last_release'] = item_2
         yield item
-          #response.xpath('//div[@class="markdown-body my-3"]/p').getall()}
-
-
 

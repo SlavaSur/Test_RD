@@ -17,5 +17,4 @@ class STestRdPipeline(object):
 
     def process_item(self, item, spider):
         self.collection.insert_one(item)
-#        self.collection.insert(item)
         return item
